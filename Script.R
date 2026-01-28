@@ -26,11 +26,17 @@ datos <- read.xlsx("DataSet SQL_Act3_ADMN.xlsx",
 
 ## 1.3 Limpieza de datos ----
 
+# Base de datos de ventas
+
 glimpse(ventas)
+
+names(ventas)
 
 names(ventas) <- make.unique(names(ventas))
 
-ventas[is.na(ventas)] <- 0
+sum(ventas == "NULL")
+
+ventas[ventas == "NULL"] <- 0
 
 ventas <- ventas |>
   mutate(OrderDate = as.Date(OrderDate, origin = "1899-12-30"),
@@ -40,5 +46,54 @@ ventas <- ventas |>
 
 summary(ventas)
 
-  
-  
+# Base de datos de compra de bicicleta
+
+glimpse(bicicleta)
+str(bicicleta)
+summary(bicicleta)
+
+bicicleta <- bicicleta |> 
+    mutate(DateFirstPurchase = as.Date(DateFirstPurchase, origin = "1899-12-30"),
+           BirthDate         = as.Date(BirthDate, origin = "1899-12-30"),
+           across(c(Country, CountryRegionCode, Group, PersonType,
+                  MaritalStatus, YearlyIncome, Gender,
+                  Education, Occupation), as.factor),
+           BikePurchase  = factor(BikePurchase, levels = c(0, 1), labels = c("No", "Yes")),
+           HomeOwnerFlag = factor(HomeOwnerFlag, levels = c(0, 1), labels = c("No", "Yes")))
+
+summary(bicicleta)
+
+# Base de datos de clientes
+
+glimpse(clientes)
+summary(clientes)
+
+sum(clientes == "NULL")
+
+clientes <- clientes |>
+  mutate(DateFirstPurchase = as.Date(DateFirstPurchase, origin = "1899-12-30"),
+         BirthDate         = as.Date(BirthDate, origin = "1899-12-30"),
+         across(c(Country, CountryRegionCode, Group, PersonType,
+                  MaritalStatus, YearlyIncome, Gender,
+                  Education, Occupation), ~ as.factor(.)),
+        HomeOwnerFlag = factor(HomeOwnerFlag, levels = c(0,1), labels = c("No","Yes")))
+
+glimpse(clientes)
+summary(clientes)
+
+# Base de datos sin etiquetar
+
+glimpse(datos)
+summary(datos)
+
+sum(datos == "NULL")
+
+which(duplicated(names(datos)))
+
+datos <- datos |>
+  filter(!if_any(everything(), ~ . == "NULL")) |>
+  mutate(Weight = as.numeric(Weight),
+         across(c(Name, Color, Size), as.factor))  
+
+
+
