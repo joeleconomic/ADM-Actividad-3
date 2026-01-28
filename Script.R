@@ -1,10 +1,11 @@
 
-# 1. Análisis descriptivo ----
+# 1. Carga y limpieza de datos ----
 
 ## 1.1 Librerias ----
 
 library(tidyverse)
 library(openxlsx)
+library(scales)
 
 ## 1.2 Carga de datos ----
 
@@ -96,4 +97,44 @@ datos <- datos |>
          across(c(Name, Color, Size), as.factor))  
 
 
+# 2. Análisis descriptivo ----
 
+## 2.1 Serie temporal de ventas ----
+
+glimpse(ventas)
+
+ggplot(ventas, aes(x = OrderDate, y = Sales)) +
+  geom_line() +
+  labs(title = NULL,
+       x = NULL,
+       y = "Ventas totales") +
+  scale_y_continuous(labels = label_number(big.mark = ".", decimal.mark = ",")) +
+  theme_minimal()
+
+# Seleccionamos solo las columnas numéricas
+ventas_num <- ventas[, c("Sales", "Sales.1", "Sales.2", "Sales.3")]
+
+# Calculamos la matriz de correlaciones
+correlaciones <- cor(ventas_num, use = "complete.obs")
+
+# Redondeamos para mostrar
+round(correlaciones, 2)
+
+## 2.2 Tabla de compra de bicicleta
+names(bicicleta)
+
+bicicleta |> 
+  group_by(BikePurchase) |> 
+  summarise(Frecuencia = n()) |> 
+  mutate(Porcentaje = round(Frecuencia / sum(Frecuencia) * 100, 2)) |> 
+  as.data.frame()
+
+# Seleccionamos solo las columnas numéricas
+bicicleta_num <- bicicleta |> 
+  select(where(is.numeric))
+
+# Calculamos la matriz de correlaciones
+correlaciones_bici <- cor(bicicleta_num, use = "complete.obs")
+
+# Redondeamos para mostrar
+round(correlaciones_bici, 2)
