@@ -188,11 +188,74 @@ confusionMatrix(pred_clase_factor, real_factor)
 print("Importancia de las variables (Árbol):")
 print(modelo_arbol$variable.importance)
 
+
 # 5. Técnicas de aprendizaje no supervisado ----
 
-# 5.1 Clustering ----
+# Usaremos el total de la muestra de la hoja Var Discreta Adq Bicicleta (bicicleta)
 
-# 5.2 Definición de las diferentes tipologías de clientes ----
+# Inspeccion inicial de los datos
+str(bicicleta)
+summary(bicicleta)
+table(bicicleta$BikePurchase)
+
+# Existen valores nulos? -> NO
+colSums(is.na(bicicleta))
+
+# Selección de las variables numéricas (Excluimos también las columnas de IDs, no aportan nada al análisis de Cluster y no contienen información de comportamiento)
+bicicleta_num_noIDs <- bicicleta_num[, -c(2, 3)]
+str(bicicleta_num_noIDs)
+summary(bicicleta_num_noIDs)
+
+# Inspeccion visual rapida
+plot(bicicleta_num_noIDs) 
+
+# Matriz de correlaciones entre las variables numéricas
+cor(bicicleta_num_noIDs)
+
+
+# 5.1 Eleccion del numero de clusteres (k) ----
+set.seed(123)   # Dado que el algoritmo es aleatorio, necesitamos fijar semilla para reproducibilidad)
+
+# Metodo general -> k=4
+fviz_nbclust(bicicleta_num_noIDs, kmeans)
+
+# Metodo del "codo" usando WSS (Within-cluster sum of squares) -> k= Entre 2 y 3
+fviz_nbclust(bicicleta_num_noIDs, kmeans, method = "wss")
+
+# Metodo nbcluster -> k=2
+NbClust(bicicleta_num_noIDs,min.nc = 2,max.nc = 8, method = "kmeans")
+
+### EL NUMERO DE CLUSTERS QUE ELEGIMOS ES 2 ###
+
+
+# 5.2 Clustering ----
+# Estandarizamos los valores de las variables (escalas muy distintas)
+bicicleta_num_escalado <- scale(bicicleta_num_noIDs)
+
+# Diferencias entre ambos:
+summary(bicicleta_num_noIDs)
+summary(bicicleta_num_escalado)
+
+# Varianzas de datos estandarizados
+apply(bicicleta_num_escalado, 2, var)  # Varianzas = 1 -> ESTANDARIZACIÓN CORRECTA
+
+# K-means con datos escalados
+set.seed(123)
+km2_escalado <- kmeans(bicicleta_num_escalado, centers = 2, nstart = 20)
+
+# Resumen de K-means
+summary(km2_escalado)
+km2_escalado$size       # Tamaños de cada cluster
+km2_escalado$centers    # Centroides (medias de cada cluster)
+
+
+# 5.3 Definición de las diferentes tipologías de clientes ----
+
+# Visualización de clústeres en el plano 
+fviz_cluster(km2_escalado, data = bicicleta_num_escalado, geom = "point")
+
+# Interpretación de los clusters: Matriz de confusión entre clústeres y Clientes que adquieren bicicletas
+table(bicicleta$BikePurchase, km2_escalado$cluster)
 
 
 # 6. Predicción de las ventas totales ----
