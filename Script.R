@@ -156,9 +156,9 @@ round(correlaciones_bici, 2)
 
 # 5. Técnicas de aprendizaje no supervisado ----
 
-# 5.1 Clustering
+# 5.1 Clustering ----
 
-# 5.2 Definición de las diferentes tipologías de clientes
+# 5.2 Definición de las diferentes tipologías de clientes ----
 
 
-# 6. Predicción de las ventas totales
+# 6. Predicción de las ventas totales ----
