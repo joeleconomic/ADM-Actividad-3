@@ -10,7 +10,7 @@ library(factoextra)
 library(NbClust)
 library(rpart)
 library(rpart.plot)
-
+library(caret)
 ## 1.2 Carga de datos ----
 
 # Hoja: ST Ventas Totales
@@ -145,18 +145,48 @@ round(correlaciones_bici, 2)
 
 
 # 3. Modelos de clasificación ----
+datos_regresion <- bicicleta %>% 
+  select(BikePurchase, TotalAmount, Country, Group, Age, MaritalStatus, 
+         YearlyIncome, Gender, TotalChildren, Education, Occupation, 
+         HomeOwnerFlag, NumberCarsOwned)
 
-# 3.1 Regresión logística (LOGIT) ----
+# Testeo y entrenamiento
+set.seed(123) 
+indice <- sample(1:nrow(datos_regresion), size = round(0.8 * nrow(datos_regresion))) 
+train <- datos_regresion[indice, ] 
+test <- datos_regresion[-indice, ]
 
-# 3.2 Árbol de decisión ----
+## 3.1 Regresión logística (LOGIT) ----
+modelo_rlog <- glm(BikePurchase ~ TotalAmount + Country + Group + Age + MaritalStatus + 
+                   YearlyIncome + Gender + TotalChildren + Education + Occupation + 
+                   HomeOwnerFlag + NumberCarsOwned, 
+                   data = train, family ="binomial")
+
+summary(modelo_rlog)
+
+## 3.2 Árbol de decisión ----
+modelo_arbol <- rpart(BikePurchase ~ TotalAmount + Country + Group + Age + MaritalStatus + 
+                      YearlyIncome + Gender + TotalChildren + Education + Occupation + 
+                      HomeOwnerFlag + NumberCarsOwned, 
+                      data = train, method ="class")
+
+rpart.plot(modelo_arbol)
 
 
 # 4. Comparación de la precisión de los modelos y ranking de importancia de variables ----
 
 # 4.1 ¿Cómo de buenos son los modelos? ----
+prob_pred <- predict(modelo_rlog, newdata = test, type = "response")
+clase_pred <- ifelse(prob_pred > 0.5, "Yes", "No")
 
+pred_clase_factor <- factor(clase_pred, levels = c("No", "Yes")) 
+real_factor <- factor(test$BikePurchase, levels = c("No", "Yes"))
+
+print("Matriz de Confusión - Regresión Logística:")
+confusionMatrix(pred_clase_factor, real_factor)
 # 4.2 Ranking según la importancia de las variables ----
-
+print("Importancia de las variables (Árbol):")
+print(modelo_arbol$variable.importance)
 
 # 5. Técnicas de aprendizaje no supervisado ----
 
