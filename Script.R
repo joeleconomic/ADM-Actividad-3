@@ -107,6 +107,8 @@ datos <- datos |>
 
 glimpse(ventas)
 
+summary(ventas)
+
 ggplot(ventas, aes(x = OrderDate, y = Sales)) +
   geom_line() +
   labs(title = NULL,
@@ -124,8 +126,10 @@ correlaciones <- cor(ventas_num, use = "complete.obs")
 # Redondeamos para mostrar
 round(correlaciones, 2)
 
-## 2.2 Tabla de compra de bicicleta
+## 2.2 Tabla de compra de bicicleta ----
 names(bicicleta)
+
+summary(bicicleta)
 
 bicicleta |> 
   group_by(BikePurchase) |> 
@@ -135,7 +139,8 @@ bicicleta |>
 
 # Seleccionamos solo las columnas numéricas
 bicicleta_num <- bicicleta |> 
-  select(where(is.numeric))
+  select(where(is.numeric)) |> 
+  select(-CustomerID, -PersonID)
 
 # Calculamos la matriz de correlaciones
 correlaciones_bici <- cor(bicicleta_num, use = "complete.obs")
