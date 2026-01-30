@@ -138,3 +138,27 @@ correlaciones_bici <- cor(bicicleta_num, use = "complete.obs")
 
 # Redondeamos para mostrar
 round(correlaciones_bici, 2)
+
+
+# 3. Modelos de clasificación ----
+
+# 3.1 Regresión logística (LOGIT) ----
+
+# 3.2 Árbol de decisión ----
+
+
+# 4. Comparación de la precisión de los modelos y ranking de importancia de variables ----
+
+# 4.1 ¿Cómo de buenos son los modelos? ----
+
+# 4.2 Ranking según la importancia de las variables ----
+
+
+# 5. Técnicas de aprendizaje no supervisado ----
+
+# 5.1 Clustering
+
+# 5.2 Definición de las diferentes tipologías de clientes
+
+
+# 6. Predicción de las ventas totales
