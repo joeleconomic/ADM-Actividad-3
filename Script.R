@@ -7,6 +7,9 @@ library(tidyverse)
 library(openxlsx)
 library(scales)
 library(factoextra)
+library(NbClust)
+library(rpart)
+library(rpart.plot)
 
 ## 1.2 Carga de datos ----
 
