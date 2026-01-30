@@ -6,6 +6,7 @@
 library(tidyverse)
 library(openxlsx)
 library(scales)
+library(factoextra)
 
 ## 1.2 Carga de datos ----
 
