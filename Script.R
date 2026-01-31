@@ -216,7 +216,7 @@ summary(bicicleta_num_noIDs)
 plot(bicicleta_num_noIDs) 
 
 # Matriz de correlaciones entre las variables numéricas
-cor(bicicleta_num_noIDs)
+cor(bicicleta_num_noIDs, use = "complete.obs")
 
 
 # 5.1 Eleccion del numero de clusteres (k) ----
