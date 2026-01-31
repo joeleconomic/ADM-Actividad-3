@@ -11,6 +11,7 @@ library(NbClust)
 library(rpart)
 library(rpart.plot)
 library(caret)
+
 ## 1.2 Carga de datos ----
 
 # Hoja: ST Ventas Totales
