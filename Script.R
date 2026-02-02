@@ -128,6 +128,7 @@ modelo_rlog <- glm(BikePurchase ~ TotalAmount + Country + Group + Age + MaritalS
                    data = train, family ="binomial")
 
 summary(modelo_rlog)
+
 #ODD Ratios
 OR <- exp(coef(modelo_rlog))
 print(OR)
@@ -150,7 +151,8 @@ summary(modelo_arbol)
 
 rpart.plot(modelo_arbol)
 
-# Evaluación y comparación de modelos ----
+
+# 4. Evaluación y comparación de modelos ----
 # Generación de Predicciones ----
 
 # Predicción con Regresión Logística (Probabilidades y Clases)
@@ -172,7 +174,6 @@ cat("--- MÉTRICAS MODELO LOGÍSTICO ---\n")
 print(mc_log)
 cat("\n--- MÉTRICAS MODELO ÁRBOL DE DECISIÓN ---\n")
 print(mc_arbol)
-
 
 # Comparación de Métricas Globales 
 
@@ -261,7 +262,6 @@ plot(bicicleta_num_noIDs)
 # Matriz de correlaciones entre las variables numéricas
 cor(bicicleta_num_noIDs, use = "complete.obs")
 
-
 # 5.1 Eleccion del numero de clusteres (k) ----
 set.seed(123)   # Dado que el algoritmo es aleatorio, necesitamos fijar semilla para reproducibilidad)
 
@@ -275,7 +275,6 @@ fviz_nbclust(bicicleta_num_noIDs, kmeans, method = "wss")
 NbClust(bicicleta_num_noIDs,min.nc = 2,max.nc = 8, method = "kmeans")
 
 ### EL NUMERO DE CLUSTERS QUE ELEGIMOS ES 2 ###
-
 
 # 5.2 Clustering ----
 # Estandarizamos los valores de las variables (escalas muy distintas)
@@ -296,7 +295,6 @@ km2_escalado <- kmeans(bicicleta_num_escalado, centers = 2, nstart = 20)
 summary(km2_escalado)
 km2_escalado$size       # Tamaños de cada cluster
 km2_escalado$centers    # Centroides (medias de cada cluster)
-
 
 # 5.3 Definición de las diferentes tipologías de clientes ----
 
