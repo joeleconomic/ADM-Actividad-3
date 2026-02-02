@@ -121,22 +121,31 @@ indice <- sample(1:nrow(datos_regresion), size = round(0.8 * nrow(datos_regresio
 train <- datos_regresion[indice, ] 
 test <- datos_regresion[-indice, ]
 
-## 2.1 Regresión logística (LOGIT) ----
+## 3.1 Regresión logística (LOGIT) ----
 modelo_rlog <- glm(BikePurchase ~ TotalAmount + Country + Group + Age + MaritalStatus + 
-                   YearlyIncome + Gender + TotalChildren + Education + Occupation + 
-                   HomeOwnerFlag + NumberCarsOwned, 
+                     YearlyIncome + Gender + TotalChildren + Education + Occupation + 
+                     HomeOwnerFlag + NumberCarsOwned, 
                    data = train, family ="binomial")
 
 summary(modelo_rlog)
 
+prob_pred <- predict(modelo_rlog, newdata = test, type = "response")
+clase_pred <- ifelse(prob_pred > 0.5, "Yes", "No")
+
+pred_clase_factor <- factor(clase_pred, levels = c("No", "Yes")) 
+real_factor <- factor(test$BikePurchase, levels = c("No", "Yes"))
+
+print("Matriz de Confusión - Regresión Logística:")
+confusionMatrix(pred_clase_factor, real_factor)
+
 ## 3.2 Árbol de decisión ----
 modelo_arbol <- rpart(BikePurchase ~ TotalAmount + Country + Group + Age + MaritalStatus + 
-                      YearlyIncome + Gender + TotalChildren + Education + Occupation + 
-                      HomeOwnerFlag + NumberCarsOwned, 
+                        YearlyIncome + Gender + TotalChildren + Education + Occupation + 
+                        HomeOwnerFlag + NumberCarsOwned, 
                       data = train, method ="class")
+summary(modelo_arbol)
 
 rpart.plot(modelo_arbol)
-
 
 # Evaluación y comparación de modelos ----
 # Generación de Predicciones ----
