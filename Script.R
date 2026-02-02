@@ -12,6 +12,7 @@ library(rpart)
 library(rpart.plot)
 library(caret)
 library(proc)
+library(forecast)
 
 ## 1.2 Carga de datos ----
 
