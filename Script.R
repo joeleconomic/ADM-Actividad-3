@@ -128,6 +128,9 @@ modelo_rlog <- glm(BikePurchase ~ TotalAmount + Country + Group + Age + MaritalS
                    data = train, family ="binomial")
 
 summary(modelo_rlog)
+#ODD Ratios
+OR <- exp(coef(modelo_rlog))
+print(OR)
 
 prob_pred <- predict(modelo_rlog, newdata = test, type = "response")
 clase_pred <- ifelse(prob_pred > 0.5, "Yes", "No")
