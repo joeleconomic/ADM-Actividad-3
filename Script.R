@@ -154,53 +154,62 @@ rpart.plot(modelo_arbol)
 
 
 # 4. Evaluación y comparación de modelos ----
+
 # Generación de Predicciones ----
 
 # Predicción con Regresión Logística (Probabilidades y Clases)
-pred_rlog_prob <- predict(modelo_rlog, newdata = test, type = "response")
-pred_rlog_class <- factor(ifelse(pred_rlog_prob > 0.5, "Yes", "No"), levels = c("No", "Yes"))
+pred_logit_prob <- predict(modelo_rlog, newdata = test, type = "response")
+pred_logit_class <- factor(ifelse(pred_logit_prob > 0.5, "Yes", "No"), levels = c("No", "Yes"))
 
 # Predicción con Árbol de Decisión (Clases y Probabilidades para ROC)
 pred_arbol_class <- predict(modelo_arbol, newdata = test, type = "class")
 pred_arbol_prob  <- predict(modelo_arbol, newdata = test, type = "prob")[, "Yes"]
 
 
-# Evaluación de Rendimiento (Matrices de Confusión) ----
+# Evaluación de Rendimiento (Matrices de Confusión)
 
-mc_log   <- confusionMatrix(pred_rlog_class, test$BikePurchase)
+# Matriz para Logit
+mc_logit <- confusionMatrix(pred_logit_class, test$BikePurchase)
+
+# Matriz para Árbol
 mc_arbol <- confusionMatrix(pred_arbol_class, test$BikePurchase)
 
 # Imprimir resultados en consola
 cat("--- MÉTRICAS MODELO LOGÍSTICO ---\n")
-print(mc_log)
+print(mc_logit)
+
 cat("\n--- MÉTRICAS MODELO ÁRBOL DE DECISIÓN ---\n")
 print(mc_arbol)
 
-# Comparación de Métricas Globales 
 
-# Cálculo de objetos ROC y AUC
-roc_logit <- roc(test$BikePurchase, pred_rlog_prob)
-roc_arbol <- roc(test$BikePurchase, pred_arbol_prob)
+# Comparación de Métricas Globales ----
+
+# Cálculo de objetos ROC y AUC (Requiere librería pROC)
+roc_logit <- roc(test$BikePurchase, pred_logit_prob, quiet = TRUE)
+roc_arbol <- roc(test$BikePurchase, pred_arbol_prob, quiet = TRUE)
 
 # Creación de tabla comparativa final
 comparativa <- data.frame(
-  Modelo = c("Regresión Logística", "Árbol de Decisión"),
-  Accuracy = c(mc_log$overall["Accuracy"], mc_arbol$overall["Accuracy"]),
-  Kappa = c(mc_log$overall["Kappa"], mc_arbol$overall["Kappa"]),
-  Sensibilidad = c(mc_log$byClass["Sensitivity"], mc_arbol$byClass["Sensitivity"]),
-  Especificidad = c(mc_log$byClass["Specificity"], mc_arbol$byClass["Specificity"]),
-  AUC = c(auc(roc_logit), auc(roc_arbol))
+  Modelo        = c("Regresión Logística", "Árbol de Decisión"),
+  Accuracy      = c(mc_logit$overall["Accuracy"], mc_arbol$overall["Accuracy"]),
+  Kappa         = c(mc_logit$overall["Kappa"], mc_arbol$overall["Kappa"]),
+  Sensibilidad  = c(mc_logit$byClass["Sensitivity"], mc_arbol$byClass["Sensitivity"]),
+  Especificidad = c(mc_logit$byClass["Specificity"], mc_arbol$byClass["Specificity"]),
+  AUC           = c(as.numeric(auc(roc_logit)), as.numeric(auc(roc_arbol)))
 )
 
 print("TABLA COMPARATIVA DE MODELOS:")
 print(comparativa)
 
-# VISUALIZACIONES E INTERPRETACIÓN
-# Importancia de Variables (Comparativa) 
+
+
+# Visualizaciones e Interpretación
+
+# Importancia de Variables
 
 # Importancia Árbol
 importancia_arbol <- data.frame(
-  Variable = names(modelo_arbol$variable.importance),
+  Variable    = names(modelo_arbol$variable.importance),
   Importancia = as.numeric(modelo_arbol$variable.importance)
 ) |> arrange(desc(Importancia))
 
@@ -215,30 +224,35 @@ importancia_logit <- summary(modelo_rlog)$coefficients |>
 # Gráfico Árbol
 ggplot(importancia_arbol, aes(x = reorder(Variable, Importancia), y = Importancia)) +
   geom_bar(stat = "identity", fill = "steelblue") +
-  coord_flip() + theme_minimal() +
+  coord_flip() + 
+  theme_minimal() +
   labs(title = "Importancia de Variables: Árbol de Decisión", x = "Variable", y = "Gini")
 
 # Gráfico Logit
 ggplot(importancia_logit, aes(x = reorder(Variable, Importancia), y = Importancia)) +
   geom_bar(stat = "identity", fill = "darkorange") +
-  coord_flip() + theme_minimal() +
+  coord_flip() + 
+  theme_minimal() +
   labs(title = "Importancia de Variables: Regresión Logística", x = "Variable", y = "Magnitud Z")
 
-# Comparativa de Precisión y Curvas ROC 
+
+# Comparativa Visual de Modelos 
+
 # Gráfico de Accuracy
 ggplot(comparativa, aes(x = Modelo, y = Accuracy, fill = Modelo)) +
   geom_bar(stat = "identity", width = 0.6) +
   geom_text(aes(label = round(Accuracy, 4)), vjust = -0.5) +
-  theme_minimal() + labs(title = "Comparativa de Precisión (Accuracy)") +
+  theme_minimal() + 
+  labs(title = "Comparativa de Precisión (Accuracy)") +
   coord_cartesian(ylim = c(0, 1))
 
 # Gráfico Curvas ROC
 plot(roc_logit, col = "blue", lwd = 2, main = "Comparativa de Curvas ROC")
 plot(roc_arbol, col = "red", lwd = 2, add = TRUE)
-legend("bottomright", legend = c(paste("Logit (AUC =", round(auc(roc_logit), 3), ")"),
-                                 paste("Árbol (AUC =", round(auc(roc_arbol), 3), ")")),
+legend("bottomright", 
+       legend = c(paste("Logit (AUC =", round(auc(roc_logit), 3), ")"),
+                  paste("Árbol (AUC =", round(auc(roc_arbol), 3), ")")),
        col = c("blue", "red"), lwd = 2)
-
 
 # 5. Técnicas de aprendizaje no supervisado ----
 
