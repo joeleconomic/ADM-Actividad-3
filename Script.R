@@ -11,7 +11,7 @@ library(NbClust)
 library(rpart)
 library(rpart.plot)
 library(caret)
-library(proc)
+library(pROC)
 library(forecast)
 
 ## 1.2 Carga de datos ----
