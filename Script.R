@@ -307,3 +307,22 @@ table(bicicleta$BikePurchase, km2_escalado$cluster)
 
 
 # 6. Predicción de las ventas totales ----
+ventas <- read_excel("Actividad03_ADMN/DataSet SQL_Act3_ADMN.xlsx", 
+                    sheet = "ST Ventas Totales ")
+ggplot(ventas, aes(x = OrderDate, y = Sales...2)) +
+  geom_line() +
+  labs(title = NULL,
+       x = NULL,
+       y = "Ventas totales") +
+  scale_y_continuous(labels = label_number(big.mark = ".", decimal.mark = ",")) +
+  theme_minimal()
+
+# Creamos serie temporal
+ts_ventas <- ts(ventas$Sales...2, start(2011,5), frequency = 365)
+plot(ts_ventas)
+
+# Creamos modelo Auto ARIMA para predecir las ventas
+modelo_arima <- auto.arima(ts_ventas)
+summary(modelo_arima)
+prediccion_ventas <- forecast(modelo_arima, h = 60)
+plot(prediccion_ventas)
